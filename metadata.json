@@ -1,0 +1,7 @@
+{
+  "name": "Gerador de Checklist A4 com Fotos",
+  "description": "Crie, edite e imprima checklists com fotos legíveis e caixas de marcação ajustados para caber perfeitamente em 1 página A4.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

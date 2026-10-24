@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Regras de Impressão Estritas para Página Única A4 */
+@page {
+  size: A4 portrait;
+  margin: 4mm 5mm 4mm 5mm;
+}
+
+@media print {
+  /* Forçar fundo 100% branco sem NENHUMA borda cinza ou margem indesejada */
+  html,
+  body,
+  #root,
+  #root > div,
+  main,
+  .a4-preview-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    transform: none !important;
+    aspect-ratio: auto !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ocultar estritamente elementos de UI, topo, rodapé da aplicação e botões no-print */
+  .no-print,
+  nav,
+  header,
+  aside,
+  .print-controls,
+  .no-print button {
+    display: none !important;
+  }
+
+  /* Container da folha de checklist A4: fluxo flex contínuo, sem cortar o rodapé */
+  .a4-print-sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background-color: #ffffff !important;
+    overflow: visible !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Destaque das bordas de cada item para impressão nítida com caneta */
+  .a4-item-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border: 1.5px solid #0f172a !important;
+    background-color: #ffffff !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Caixinha para assinalar impressa com nitidez total (não fica transparente) */
+  .checklist-checkbox {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    border: 2px solid #000000 !important;
+    background-color: #ffffff !important;
+    border-radius: 3px !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .checklist-checkbox span {
+    display: block !important;
+    visibility: visible !important;
+    color: #000000 !important;
+  }
+
+  /* Linhas pautadas de observação impressas claramente com cor escura */
+  .border-dashed {
+    border-bottom: 1.5px dashed #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Indicador de visualização da folha A4 no navegador */
+.a4-preview-container {
+  aspect-ratio: 210 / 297;
+  width: 100%;
+  max-width: 794px; /* A4 em ~96dpi */
+  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
