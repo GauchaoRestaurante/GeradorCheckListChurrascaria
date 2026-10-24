@@ -56,6 +56,7 @@ export default function App() {
   const [editingItem, setEditingItem] = useState<ChecklistItem | null>(null);
   const [cameraTargetItem, setCameraTargetItem] = useState<ChecklistItem | null>(null);
   const [showPrintTips, setShowPrintTips] = useState(false);
+  const [show6RowsBanner, setShow6RowsBanner] = useState(false);
 
   // Auto-save on every change
   useEffect(() => {
@@ -223,6 +224,7 @@ export default function App() {
     let newItemSpacing: ItemSpacingOption = config.itemSpacing;
     let newNotesLines = config.notesLines;
     let newSimpleColumns = config.simpleColumns || 2;
+    let newShowNotesArea = config.showNotesArea;
 
     // Ajuste das colunas para os itens simples (sem foto)
     if (simpleCount > 6) {
@@ -240,18 +242,20 @@ export default function App() {
         newPhotoSize = 'md';
         newItemSpacing = 'balanced';
         newNotesLines = 2;
-      } else if (photoCount <= 11) {
+      } else if (photoCount <= 10) {
         newColumns = 2;
         newFontSize = 'base';
         newPhotoSize = 'md';
         newItemSpacing = 'compact';
         newNotesLines = 2;
-      } else if (photoCount <= 13) {
+      } else if (photoCount <= 12) {
+        // Encaixe calibrado de 6 linhas (11 a 12 itens com foto) em 2 colunas:
+        // Sacrifica o campo de observações para garantir 1 página A4 com folga e sem cortes
         newColumns = 2;
         newFontSize = 'base';
         newPhotoSize = 'sm';
         newItemSpacing = 'compact';
-        newNotesLines = 1;
+        newShowNotesArea = false;
       } else if (photoCount <= 18) {
         newColumns = 3;
         newFontSize = 'base';
@@ -272,12 +276,12 @@ export default function App() {
         newPhotoSize = 'md';
         newItemSpacing = 'balanced';
         newNotesLines = 2;
-      } else if (photoCount <= 13) {
+      } else if (photoCount <= 12) {
         newColumns = 2;
         newFontSize = 'base';
         newPhotoSize = 'sm';
         newItemSpacing = 'compact';
-        newNotesLines = 2;
+        newShowNotesArea = false;
       } else if (photoCount <= 18) {
         newColumns = 3;
         newFontSize = 'base';
@@ -301,7 +305,24 @@ export default function App() {
       itemSpacing: newItemSpacing,
       notesLines: newNotesLines,
       simpleColumns: newSimpleColumns,
+      showNotesArea: newShowNotesArea,
     }));
+  };
+
+  // Força o encaixe perfeito de 6 linhas (12 itens) em 1 página A4 (sacrificando observações)
+  const handleForce6RowsMode = () => {
+    setConfig((prev) => ({
+      ...prev,
+      columns: 2,
+      photoSize: 'sm',
+      fontSize: 'base',
+      itemSpacing: 'compact',
+      showNotesArea: false, // Sacrifica o campo de observação conforme solicitado
+    }));
+    setShow6RowsBanner(true);
+    setTimeout(() => {
+      setShow6RowsBanner(false);
+    }, 6000);
   };
 
   const handlePrint = () => {
@@ -449,6 +470,20 @@ export default function App() {
               Extra Grande
             </button>
           </div>
+
+          {/* Botão Especial: Forçar 6 Linhas por Folha */}
+          <button
+            onClick={handleForce6RowsMode}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
+              config.columns === 2 && config.photoSize === 'sm' && config.itemSpacing === 'compact' && !config.showNotesArea
+                ? 'bg-indigo-600 text-white border-indigo-700 shadow-2xs'
+                : 'bg-indigo-50 text-indigo-900 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300'
+            }`}
+            title="Calibra fotos proporcionais, espaçamento compacto e sacrifica as observações para caber 6 linhas em 1 página A4"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Forçar 6 Linhas / Folha</span>
+          </button>
         </div>
 
         {/* Zona 3: Ações Principais: Biblioteca e Imprimir */}
@@ -472,6 +507,24 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {/* Banner de Confirmação: Modo 6 Linhas Ativado */}
+      {show6RowsBanner && (
+        <div className="no-print bg-indigo-600 text-white px-4 py-2 text-xs font-medium flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
+            <span>
+              <strong>Modo 6 Linhas Ativado:</strong> Fotos calibradas proporcionalmente em 104px, 2 colunas lado a lado, espaçamento compacto e <strong>campo de observação removido</strong> para garantir que até 6 linhas (12 itens com foto) caibam perfeitamente em 1 folha A4 sem cortes!
+            </span>
+          </div>
+          <button
+            onClick={() => setShow6RowsBanner(false)}
+            className="text-white hover:text-indigo-200 font-bold ml-4 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Dica de Impressão Rápida */}
       {showPrintTips && (
@@ -497,7 +550,7 @@ export default function App() {
         <aside className="no-print w-full lg:w-[420px] bg-white border-r border-slate-200 flex flex-col shrink-0 lg:h-[calc(100vh-53px)]">
           {/* Indicador de Encaixe na Página A4 */}
           <div className="p-3 border-b border-slate-200 bg-slate-50/70">
-            <PageFitIndicator config={config} onAutoFit={handleAutoFitA4} />
+            <PageFitIndicator config={config} onAutoFit={handleAutoFitA4} onForce6Rows={handleForce6RowsMode} />
           </div>
 
           {/* Abas do Painel */}
@@ -925,6 +978,30 @@ export default function App() {
                     <span className="text-[10px] opacity-75 font-normal">
                       Para listas com 13 a 18 itens
                     </span>
+                  </button>
+                </div>
+
+                {/* Card de Ação Rápida: Forçar 6 Linhas por Página */}
+                <div className="mt-3 p-3 bg-linear-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-indigo-950 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      Forçar 6 Linhas (12 Itens)
+                    </span>
+                    <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">
+                      Folha Única A4
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-indigo-900 leading-snug">
+                    Ajusta automaticamente fotos em 104px, espaçamento compacto e <strong>sacrifica o campo de observações</strong> para garantir 6 linhas inteiras em 1 única página A4 sem cortes.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleForce6RowsMode}
+                    className="w-full py-2 px-3 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Aplicar Configuração para 6 Linhas
                   </button>
                 </div>
               </div>

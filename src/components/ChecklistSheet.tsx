@@ -119,7 +119,7 @@ export const ChecklistSheet: React.FC<ChecklistSheetProps> = ({
         lg: 'w-[104px] h-[104px] min-w-[104px]',
       }[photoSize]
     : {
-        sm: 'w-[112px] h-[112px] min-w-[112px]',
+        sm: 'w-[104px] h-[104px] min-w-[104px]', // Altura otimizada para encaixar 6 linhas completas na folha A4
         md: 'w-[136px] h-[136px] min-w-[136px] sm:w-[144px] sm:h-[144px] sm:min-w-[144px]',
         lg: 'w-[155px] h-[155px] min-w-[155px]',
       }[photoSize];
@@ -145,11 +145,17 @@ export const ChecklistSheet: React.FC<ChecklistSheetProps> = ({
     // 2 colunas: A foto estende-se para ocupar a área útil do quadro (cabem 2 itens certinhos por linha)
     switch (ratio) {
       case '16:9':
-        return 'w-[160px] h-[90px] min-w-[160px] aspect-video';
+        return photoSize === 'sm'
+          ? 'w-[136px] h-[76px] min-w-[136px] aspect-video'
+          : 'w-[160px] h-[90px] min-w-[160px] aspect-video';
       case '9:16':
-        return 'w-[80px] h-[142px] min-w-[80px] aspect-[9/16]';
+        return photoSize === 'sm'
+          ? 'w-[64px] h-[114px] min-w-[64px] aspect-[9/16]'
+          : 'w-[80px] h-[142px] min-w-[80px] aspect-[9/16]';
       case '4:3':
-        return 'w-[144px] h-[108px] min-w-[144px] aspect-[4/3]';
+        return photoSize === 'sm'
+          ? 'w-[120px] h-[90px] min-w-[120px] aspect-[4/3]'
+          : 'w-[144px] h-[108px] min-w-[144px] aspect-[4/3]';
       case '1:1':
       default:
         return `${photoDimensions} aspect-square`;
@@ -158,7 +164,7 @@ export const ChecklistSheet: React.FC<ChecklistSheetProps> = ({
 
   // Spacing classes between items
   const spacingClasses = {
-    compact: 'gap-1.5 p-1',
+    compact: 'gap-1.5 p-0.5',
     balanced: 'gap-2 p-1.5',
     spacious: 'gap-2.5 p-2',
   }[itemSpacing];
@@ -293,9 +299,9 @@ export const ChecklistSheet: React.FC<ChecklistSheetProps> = ({
             return (
               <div
                 key={item.id}
-                className={`a4-item-card group relative flex items-center gap-2.5 border ${
+                className={`a4-item-card group relative flex items-center gap-2 border ${
                   highContrast ? 'border-slate-900 bg-white' : 'border-slate-300 bg-white'
-                } rounded-md p-1.5 transition-colors hover:border-slate-900 hover:bg-slate-50 col-span-1 print:col-span-1`}
+                } rounded-md ${itemSpacing === 'compact' ? 'p-1' : 'p-1.5'} transition-colors hover:border-slate-900 hover:bg-slate-50 col-span-1 print:col-span-1`}
               >
                 {/* 1. FOTO DO ITEM QUE SE ESTENDE E OCUPA A ÁREA DISPONÍVEL DO QUADRO */}
                 <div
